@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Regex => DFA تبدیل</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,user-scalable=no"
+    />
+    <meta
+      name="google-site-verification"
+      content="tXyJhIUjwgDkdY4scPFF1nBiVW9co3-HjowXazdoL7I"
+    />
+    <link rel="stylesheet" href="./lib/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="./lib/css/bootstrap-material-design.min.css" />
+    <link rel="stylesheet" href="./css/toolbox.css" />
+    <link rel="stylesheet" href="./css/nfa2dfa.css" />
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css"
+    /> -->
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+      body {
+        position: relative;
+        min-height: 100vh;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(3px);
+        z-index: 5;
+      }
+      .modal_my {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.4rem;
+        width: 450px;
+        padding: 1.3rem;
+        height: 250px;
+        position: absolute;
+        top: 20%;
+        left: 30%;
+        background-color: #576574;
+        color: #ecf0f1;
+        border: 1px solid #ddd;
+        border-radius: 15px;
+        z-index: 8;
+      }
+      .active_modal {
+        display: block;
+      }
+
+      .deActive_modal {
+        display: none;
+      }
+
+      .modal_text {
+        direction: rtl;
+        font-size: 19px;
+        font-weight: bold;
+      }
+
+      .modal_my > button {
+        font-size: 16px;
+        font-weight: bold;
+        background: #2e86de;
+        padding: 5px;
+        border: 1px solid white;
+        border-radius: 15px;
+      }
+      .my_anme {
+        text-align: center;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body class="overlay">
+    <!-- <div id="ex1" class="modal">
+      <p>Thanks for clicking. That felt good.</p>
+      <a href="#" rel="modal:close">Close</a>
+    </div>
+    <p><a href="#ex1" rel="modal:open">Open Modal</a></p> -->
+
+    <div class="modal_my">
+      <div class="modal_text">
+        <p>پروژه نظریه زبان و ماشین</p>
+        <p>موضوع : تبدیل عبارات با قاعده به DFA</p>
+        <p class="my_anme">علی شکیبایی</p>
+      </div>
+      <button class="btn_close_modal">بستن</button>
+    </div>
+
+    <div class="container-fluid container-body">
+      <!-- Body Begin -->
+      <link rel="stylesheet" href="./css/automata.css" />
+
+      <div class="row deActive_modal hinttt">
+        <span class="col-md-3"> </span>
+        <span class="col-md-3">
+          <div class="well">
+            <h4>Supported grammars</h4>
+            <ul>
+              <li>r = (s)</li>
+              <li>r = st</li>
+              <li>r = s|t</li>
+              <li>r = s*</li>
+              <li>r = s+</li>
+              <li>r = s?</li>
+              <li>r = ϵ</li>
+            </ul>
+          </div>
+        </span>
+        <span class="col-md-3">
+          <div class="well">
+            <h4>Examples</h4>
+            <ul>
+              <li>(a|b)*</li>
+              <li>(a*|b*)*</li>
+              <li>((ϵ|a)b*)*</li>
+            </ul>
+          </div>
+        </span>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="input_regex" class="col-md-1 control-label"
+            >Input:
+          </label>
+          <div class="col-md-11">
+            <input
+              type="text"
+              class="form-control"
+              id="input_regex"
+              placeholder="((ϵ|a)b*)*"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-offset-10 col-md-2">
+          <button
+            id="button_convert"
+            class="btn btn-raised btn-block btn-primary"
+          >
+            Convert
+          </button>
+        </div>
+      </div>
+      <div id="alert_error" class="alert alert-dismissible alert-danger" hidden>
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Invalid Grammar</strong>
+        <p id="p_error"></p>
+      </div>
+      <div id="nfa_link"></div>
+      <div id="min_dfa_link"></div>
+      <div class="row">
+        <div id="dfa_table" class="col-xs-12"></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <svg id="svg" width="800">
+            <g></g>
+          </svg>
+        </div>
+      </div>
+
+      <script src="./lib/js/d3.v3.min.js"></script>
+      <script src="./lib/js/dagre-d3.min.js"></script>
+      <script src="./js/lexical.js"></script>
+      <script src="./js/automata.js"></script>
+
+      <!-- Body End -->
+    </div>
+
+    <script src="./lib/js/jquery.min.js"></script>
+    <script src="./lib/js/bootstrap.min.js"></script>
+    <script src="./lib/js/ripples.min.js"></script>
+    <script src="./lib/js/material.min.js"></script>
+    <script src="./js/nfa2dfa.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script> -->
+    <script>
+      $(function () {
+        $.material.init();
+      });
+
+      $(document).ready(function () {
+        $(".btn_close_modal").click(function () {
+          $(".modal_my").addClass("deActive_modal");
+          $("body").removeClass("overlay");
+          $(".hinttt").removeClass("deActive_modal");
+        });
+      });
+    </script>
+  </body>
+</html>
